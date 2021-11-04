@@ -1,0 +1,96 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  comments      Comment[]
+  createdAt     DateTime       @default(now())
+  firstName     String?
+  id            String         @id @default(cuid())
+  lastName      String?
+  password      String
+  roles         String[]
+  updatedAt     DateTime       @updatedAt
+  username      String         @unique
+  userReactions UserReaction[]
+}
+
+model BaseEntity {
+  createdAt     DateTime       @default(now())
+  deletedAt     DateTime?
+  id            String         @id @default(cuid())
+  updatedAt     DateTime       @updatedAt
+  userReactions UserReaction[]
+}
+
+model ContentItem {
+  content       String?
+  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  summary       String?
+  title         String
+  titleMediaUrl String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Place {
+  coordinate String
+  createdAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  title      String
+  updatedAt  DateTime @updatedAt
+}
+
+model NewsItem {
+  content       String?
+  createdAt     DateTime  @default(now())
+  id            String    @id @default(cuid())
+  publishedAt   DateTime?
+  summary       String?
+  title         String
+  titleMediaUrl String?
+  updatedAt     DateTime  @updatedAt
+}
+
+model Comment {
+  content     String?
+  createdAt   DateTime @default(now())
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
+  id          String   @id @default(cuid())
+  updatedAt   DateTime @updatedAt
+}
+
+model Reaction {
+  createdAt     DateTime       @default(now())
+  id            String         @id @default(cuid())
+  type          String
+  updatedAt     DateTime       @updatedAt
+  userReactions UserReaction[]
+}
+
+model UserReaction {
+  createdAt   DateTime    @default(now())
+  createdBy   User?       @relation(fields: [createdById], references: [id])
+  createdById String?
+  entity      BaseEntity? @relation(fields: [entityId], references: [id])
+  entityId    String?
+  id          String      @id @default(cuid())
+  reaction    Reaction?   @relation(fields: [reactionId], references: [id])
+  reactionId  String?
+  updatedAt   DateTime    @updatedAt
+}
+
+model Product {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  price     Float?
+  summary   String?
+  title     String?
+  updatedAt DateTime @updatedAt
+}
